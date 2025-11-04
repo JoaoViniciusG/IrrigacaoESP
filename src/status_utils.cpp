@@ -21,13 +21,9 @@ void setStatus(Status newStatus)
     awaitingMobileConnection();
   }
 
-  if (newStatus == Status::DISABLED)
-  {
-    ESP_ENABLED = false;
-  }
-
   if (newStatus == Status::ENABLED || newStatus == Status::DISABLED)
   {
+    ESP_ENABLED = newStatus == Status::ENABLED;
     if (!checkWifi())
     {
       setStatus(Status::DISCONNECTED);

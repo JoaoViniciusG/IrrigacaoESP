@@ -35,8 +35,7 @@ void reconnect()
       client.subscribe(topicPing.c_str(), 0);
       client.subscribe(topicCommand.c_str());
 
-      String data = buildDataJson();
-      mqttPublish(topicData, data);
+      sendData();
 
       setStatus(Status::ENABLED);
     }
@@ -110,8 +109,7 @@ static void onMqttMessage(char *topic, byte *payload, unsigned int length)
   // RESPOSTA AO PING DE DADOS //
   if (t == topicPing)
   {
-    String data = buildDataJson();
-    mqttPublish(topicData, data);
+    sendData();
   }
   // EXECUTAR COMANDO //
   else if (t == topicCommand)
@@ -140,9 +138,14 @@ static void onMqttMessage(char *topic, byte *payload, unsigned int length)
       }
     }
 
-    String data = buildDataJson();
-    mqttPublish(topicData, data);
+    sendData();
   }
+}
+
+void sendData()
+{
+  String data = buildDataJson();
+  mqttPublish(topicData, data);
 }
 
 static String buildDataJson()

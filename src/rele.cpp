@@ -7,6 +7,8 @@ bool RELE_DANGER = false;
 bool RELE_ACTIVATED_TIMER = LOW;
 int RELE_PIN;
 
+extern void sendData();
+
 unsigned long RELE_OFF_TIME = 0;
 
 void setupRele(int port)
@@ -30,7 +32,9 @@ void setReleState()
   {
     RELE_DANGER = false;
   }
+
   digitalWrite(RELE_PIN, RELE_STATE);
+  sendData();
 }
 
 void changeReleState()
