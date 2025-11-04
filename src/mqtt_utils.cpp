@@ -80,7 +80,8 @@ void mqttInit(const char *server, int port, const char *userid, const char *user
 
 void mqttLoop()
 {
-  if (!client.connected() && toConnectMqtt) reconnect();
+  if (!client.connected() && toConnectMqtt)
+    reconnect();
   client.loop();
 }
 
@@ -129,10 +130,14 @@ static void onMqttMessage(char *topic, byte *payload, unsigned int length)
       controlRele(doc["data"]["state"], doc["data"]["time"]);
     }
 
-    if (doc["command"] == "status")
+    if (doc["command"] == "toggle_status")
     {
-      Status newStatus = doc["data"]["status"] ? Status::ENABLED : Status::DISABLED;  
-      setStatus(newStatus);
+      Status currentState = getStatus();
+      if (currentState == Status::ENABLED || currentState == Status::DISABLED)
+      {
+        Status newStatus = (currentState == Status::DISABLED) ? Status::ENABLED : Status::DISABLED;
+        setStatus(newStatus);
+      }
     }
 
     String data = buildDataJson();
