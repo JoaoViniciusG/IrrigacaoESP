@@ -27,6 +27,15 @@ struct Config {
   String BaseUrl;
 };
 
+struct Schedule {
+  String id;
+  String time;
+  uint8_t days;
+  uint16_t duration;
+  bool status;
+  bool executedToday;
+};
+
 // =================== TYPEDEFS ===================
 typedef unsigned long timestamp_t;
 typedef void (*Callback)();

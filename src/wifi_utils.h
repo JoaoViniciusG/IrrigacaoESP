@@ -4,7 +4,10 @@
 #include "rtc.h"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
+#include "status_utils.h"
 
-void setupWiFi(String ssid, String password);
+void setupWiFi(const char* ssid, const char* password);
+bool checkWifi();
+void loopWiFi();
 
 #endif

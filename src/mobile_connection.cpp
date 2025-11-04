@@ -118,6 +118,7 @@ void awaitingMobileConnection()
           delay(300);
 
           // FECHA O WEBSOCKET E O AP
+          Serial.println("Conexão AP desconectada!");
           ws.close(); 
           ws.disconnect();
           WiFi.softAPdisconnect(false);

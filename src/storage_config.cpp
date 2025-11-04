@@ -4,6 +4,8 @@
 
 Config config;
 
+extern void configMqtt();
+
 int loadConfig() {
   if (!LittleFS.begin()) return 0;
   if (!LittleFS.exists("/config.json")) return 2;
@@ -34,6 +36,8 @@ int loadConfig() {
   config.BaseUrl = doc["BaseUrl"].as<String>();
   
   Serial.println("✅ Configuração carregada com sucesso!");
+
+  configMqtt();
   return 1;
 }
 

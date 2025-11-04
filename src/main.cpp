@@ -10,6 +10,9 @@
 #include "led.h"
 #include "rtc.h"
 #include "soil.h"
+#include "scheduler.h"
+
+bool ESP_ENABLED = true;
 
 const int LED_RED = D1;
 const int LED_GREEN = D2;
@@ -26,11 +29,10 @@ void setup()
 {
   // STARTING SERIAL //
   Serial.begin(115200);
-  
+
   // LOADING CONFIG //
+  loadSchedules();
   int configStatus = loadConfig();
-  config.IdUser = "8860e4fe-b6ca-11f0-b0a9-862ccfb01bc1";
-  saveConfig();
   printConfig();
 
   // DEFINITIONS //
@@ -54,11 +56,13 @@ void loop()
 {
   Status status = getStatus();
 
-  loopRele();
-  loopSoil();
-  mqttLoop();
   handleButton(getStatus());
   updateLeds(getStatus());
+  loopScheduler();
+  loopRele();
+  loopSoil();
+  loopWiFi();
+  mqttLoop();
 
   if (status == Status::AWAITING_CONNECTION)
   {
@@ -66,9 +70,12 @@ void loop()
   }
 }
 
-void connectServer()
+void connectWifi()
 {
-  setupWiFi(config.WifiSSID, config.WifiPassword);
+  setupWiFi(config.WifiSSID.c_str(), config.WifiPassword.c_str());
+}
 
+void configMqtt()
+{
   mqttInit(config.MqttHost.c_str(), config.MqttPort, config.IdUser.c_str(), config.MqttUser.c_str(), config.MqttPassword.c_str(), String(identifier + "_" + config.Id).c_str());
 }

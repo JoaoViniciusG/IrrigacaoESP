@@ -22,13 +22,13 @@ void reconnect()
   {
     Serial.print("Tentando MQTT... ");
     if (client.connect(
-        clientName.c_str(),
-        mqttUsername.c_str(),
-        mqttPassword.c_str(),
-        topicStatus.c_str(),
-        1,
-        true,
-        "offline"))
+            clientName.c_str(),
+            mqttUsername.c_str(),
+            mqttPassword.c_str(),
+            topicStatus.c_str(),
+            1,
+            true,
+            "offline"))
     {
       Serial.println("✅ Conectado ao broker MQTT com sucesso!");
       client.publish(topicStatus.c_str(), "online", true);
@@ -64,8 +64,6 @@ void mqttInit(const char *server, int port, const char *userid, const char *user
   topicPing = "esp8266/" + String(userid) + "/ping";
   topicCommand = "esp8266/" + String(name) + "/command";
 
-  toConnectMqtt = true;
-
   mqttUsername = strdup(username);
   mqttPassword = strdup(password);
   clientName = strdup(name);
@@ -74,7 +72,7 @@ void mqttInit(const char *server, int port, const char *userid, const char *user
   client.setServer(server, port);
   client.setCallback(onMqttMessage);
 
-  Serial.print("🔧 Inicializando MQTT -> ");
+  Serial.print("🔧 Configurando MQTT -> ");
   Serial.print(server);
   Serial.print(":");
   Serial.println(port);
@@ -82,8 +80,7 @@ void mqttInit(const char *server, int port, const char *userid, const char *user
 
 void mqttLoop()
 {
-  if (!client.connected() && toConnectMqtt)
-    reconnect();
+  if (!client.connected() && toConnectMqtt) reconnect();
   client.loop();
 }
 
@@ -121,14 +118,25 @@ static void onMqttMessage(char *topic, byte *payload, unsigned int length)
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, payloadStr);
 
-    if (error) {
+    if (error)
+    {
       Serial.print("Falha ao deserializar JSON!");
       return;
     }
 
-    if (doc["command"] == "rele") {
+    if (doc["command"] == "rele")
+    {
       controlRele(doc["data"]["state"], doc["data"]["time"]);
     }
+
+    if (doc["command"] == "status")
+    {
+      Status newStatus = doc["data"]["status"] ? Status::ENABLED : Status::DISABLED;  
+      setStatus(newStatus);
+    }
+
+    String data = buildDataJson();
+    mqttPublish(topicData, data);
   }
 }
 
@@ -144,4 +152,9 @@ static String buildDataJson()
   String out;
   serializeJson(doc, out);
   return out;
+}
+
+bool getMqttStatus()
+{
+  return client.connected();
 }

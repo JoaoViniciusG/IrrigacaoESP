@@ -1,5 +1,7 @@
 #include "rele.h"
 
+extern bool ESP_ENABLED;
+
 bool RELE_STATE = LOW;
 bool RELE_DANGER = false;
 bool RELE_ACTIVATED_TIMER = LOW;
@@ -14,15 +16,18 @@ void setupRele(int port)
   digitalWrite(RELE_PIN, RELE_STATE);
 }
 
-void disabledIfDanger() {
-  if (RELE_STATE == HIGH && RELE_DANGER) {
-    changeReleState(); 
+void disabledIfDanger()
+{
+  if (RELE_STATE == HIGH && RELE_DANGER)
+  {
+    changeReleState();
   }
 }
 
-void setReleState() 
+void setReleState()
 {
-  if(RELE_STATE == LOW) {
+  if (RELE_STATE == LOW)
+  {
     RELE_DANGER = false;
   }
   digitalWrite(RELE_PIN, RELE_STATE);
@@ -30,26 +35,36 @@ void setReleState()
 
 void changeReleState()
 {
+if (!ESP_ENABLED) return;
+
   RELE_STATE = !RELE_STATE;
   setReleState();
 }
 
 void controlRele(bool state, int tempoSegundos)
 {
-  if (state) {
+  if (!ESP_ENABLED) return;
+
+  if (state)
+  {
     RELE_STATE = HIGH;
     setReleState();
 
-    if (tempoSegundos > 0) {
+    if (tempoSegundos > 0)
+    {
       RELE_OFF_TIME = millis() + (unsigned long)tempoSegundos * 1000UL;
       RELE_ACTIVATED_TIMER = HIGH;
       RELE_DANGER = false;
-    } else {
+    }
+    else
+    {
       RELE_DANGER = true;
       RELE_ACTIVATED_TIMER = LOW;
       RELE_OFF_TIME = 0;
     }
-  } else {
+  }
+  else
+  {
     RELE_STATE = LOW;
     setReleState();
     RELE_DANGER = false;
@@ -60,7 +75,14 @@ void controlRele(bool state, int tempoSegundos)
 
 void loopRele()
 {
-  if (RELE_ACTIVATED_TIMER && millis() >= RELE_OFF_TIME) {
+  if (!ESP_ENABLED)
+  {
+    if (RELE_STATE == HIGH) changeReleState();
+    return;
+  }
+
+  if (RELE_ACTIVATED_TIMER && millis() >= RELE_OFF_TIME)
+  {
     RELE_STATE = LOW;
     setReleState();
     RELE_ACTIVATED_TIMER = LOW;

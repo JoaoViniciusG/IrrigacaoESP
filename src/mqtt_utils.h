@@ -13,6 +13,7 @@
 
 extern bool toConnectMqtt;
 
+bool getMqttStatus();
 void mqttInit(const char* server, int port, const char* userid, const char* username, const char* password, const char* name);
 void mqttLoop();
 void mqttPublish(String topic, String message);
