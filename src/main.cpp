@@ -10,7 +10,7 @@
 #include "led.h"
 #include "rtc.h"
 #include "soil.h"
-// #include "scheduler.h"
+#include "scheduler.h"
 
 bool ESP_ENABLED = true;
 
@@ -31,11 +31,8 @@ void setup()
   Serial.begin(115200);
 
   // LOADING CONFIG //
-  // loadSchedules();
+  loadSchedules();
   int configStatus = loadConfig();
-  config.WifiSSID = "Lab. Robotica";
-  config.WifiPassword = "R0bolab@2025";
-  saveConfig();
   printConfig();
 
   // DEFINITIONS //
@@ -61,7 +58,7 @@ void loop()
 
   handleButton(getStatus());
   updateLeds(getStatus());
-  // loopScheduler();
+  loopScheduler();
   loopRele();
   loopSoil();
   loopWiFi();

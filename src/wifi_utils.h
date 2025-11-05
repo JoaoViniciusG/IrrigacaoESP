@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include "status_utils.h"
+#include "scheduler.h"
 
 void setupWiFi(const char* ssid, const char* password);
 bool checkWifi();

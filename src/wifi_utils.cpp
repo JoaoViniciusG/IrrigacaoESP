@@ -24,6 +24,7 @@ void loopWiFi() {
 
         Serial.printf("\n✅ Conectado! IP: %s\n", WiFi.localIP().toString().c_str());
         syncRTCFromServer();
+        syncSchedulersFromServer();
       }
     }
   }
