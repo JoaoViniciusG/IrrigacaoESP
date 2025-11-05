@@ -32,6 +32,7 @@ void setup()
 
   // LOADING CONFIG //
   loadSchedules();
+  Serial.print(identifier);
   int configStatus = loadConfig();
   printConfig();
 

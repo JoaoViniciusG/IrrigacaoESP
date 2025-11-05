@@ -184,7 +184,7 @@ void resetDailyFlags()
   Serial.println("📆 Flags diárias resetadas.");
 }
 
-void syncRTCFromServer()
+void syncSchedulersFromServer()
 {
   WiFiClientSecure client;
   client.setInsecure();
