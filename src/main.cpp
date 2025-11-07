@@ -18,8 +18,8 @@ const int LED_RED = D1;
 const int LED_GREEN = D2;
 const int BUTTON = D3;
 const int RELE = D4;
-const int RTC_SDA = D5;
-const int RTC_SCL = D6;
+const int RTC_SDA = D6;
+const int RTC_SCL = D5;
 const int SOIL_ANALOG = A0;
 const int SOIL_VCC = D7;
 
