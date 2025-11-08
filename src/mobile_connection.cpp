@@ -75,25 +75,21 @@ void awaitingMobileConnection()
           String pass = doc["pass"] | "";
 
           // FEEDBACK: CONECTANDO AO WIFI
-          JsonDocument prog; prog["type"]="provision_progress"; prog["stage"]="Conectando-se a rede Wifi...";
+          JsonDocument prog; prog["type"]="provision_progress"; prog["stage"]=0;
           String o; serializeJson(prog, o); ws.sendTXT(num, o);
 
           String reason;
           bool wifiOk = tryConnectWifi(ssid, pass, reason);
           if (!wifiOk) {
-            JsonDocument res; res["type"]="provision_result"; res["ok"]=false; res["reason"]=reason;
+            JsonDocument res; res["type"]="provision_result"; prog["stage"]=0, res["ok"]=false;
             String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
 
             sendNetworks(num);
             return;
           }
 
-          // FEEDBACK: IP LOCAL
-          prog.clear(); prog["type"]="provision_progress"; prog["stage"]="Obtendo IP local.";
-          o.clear(); serializeJson(prog, o); ws.sendTXT(num, o);
-
-          // FEEDBACK: CONECTANDO COM O SERVIDOR
-          prog.clear(); prog["type"]="provision_progress"; prog["stage"]="Conectando-se aos servidores.";
+          // FEEDBACK: WIFI CONECTADO E ENVIANDO DADOS AO SERVIDOR
+          prog.clear(); prog["type"]="provision_progress"; prog["stage"]=0; prog["ok"]=true;
           o.clear(); serializeJson(prog, o); ws.sendTXT(num, o);
 
           // ENVIANDO DADOS
@@ -102,17 +98,17 @@ void awaitingMobileConnection()
 
           // FEEDBACK: FALHA NA CONEXÃO
           if (!apiOk) {
-            JsonDocument res; res["type"]="provision_result"; res["ok"]=false; res["reason"]="Falha na conexão!";
+            JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=false;
             String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
             return;
           }
 
+          // FEEDBACK: SUCESSO
+          JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=true;
+          String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
+          
           // RECARREGA AS CONFIGURAÇÕES DE INICIALIZAÇÃO
           loadConfig();
-
-          // FEEDBACK: SUCESSO
-          JsonDocument res; res["type"]="provision_result"; res["ok"]=true;
-          String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
 
           // RECEBE OS ÚLTIMOS PACOTES
           delay(300);
