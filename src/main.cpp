@@ -34,8 +34,6 @@ void setup()
   loadSchedules();
   Serial.print(identifier);
   int configStatus = loadConfig();
-  config.WifiSSID = "ELIANA";
-  config.WifiPassword = "96030305";
   printConfig();
 
   // DEFINITIONS //

@@ -76,20 +76,21 @@ void awaitingMobileConnection()
 
           // FEEDBACK: CONECTANDO AO WIFI
           JsonDocument prog; prog["type"]="provision_progress"; prog["stage"]=0;
+          JsonDocument prog; prog["type"]="provision_progress"; prog["stage"]=0;
           String o; serializeJson(prog, o); ws.sendTXT(num, o);
 
           String reason;
           bool wifiOk = tryConnectWifi(ssid, pass, reason);
           if (!wifiOk) {
-            JsonDocument res; res["type"]="provision_result"; prog["stage"]=0, res["ok"]=false;
+            JsonDocument res; res["type"]="provision_result"; res["stage"]=0; res["ok"]=false;
             String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
 
             sendNetworks(num);
             return;
           }
 
-          // FEEDBACK: WIFI CONECTADO E ENVIANDO DADOS AO SERVIDOR
-          prog.clear(); prog["type"]="provision_progress"; prog["stage"]=0; prog["ok"]=true;
+          // FEEDBACK: CONECTANDO COM O SERVIDOR
+          prog.clear(); prog["type"]="provision_result"; prog["ok"]=true; prog["stage"]=0;
           o.clear(); serializeJson(prog, o); ws.sendTXT(num, o);
 
           // ENVIANDO DADOS
@@ -98,6 +99,7 @@ void awaitingMobileConnection()
 
           // FEEDBACK: FALHA NA CONEXÃO
           if (!apiOk) {
+            JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=false;
             JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=false;
             String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
             return;
@@ -110,8 +112,12 @@ void awaitingMobileConnection()
           // RECARREGA AS CONFIGURAÇÕES DE INICIALIZAÇÃO
           loadConfig();
 
+          // FEEDBACK: SUCESSO
+          JsonDocument res; res["type"]="final";
+          String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
+
           // RECEBE OS ÚLTIMOS PACOTES
-          delay(300);
+          delay(3000);
 
           // FECHA O WEBSOCKET E O AP
           Serial.println("Conexão AP desconectada!");
