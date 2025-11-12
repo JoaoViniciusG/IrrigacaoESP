@@ -76,13 +76,12 @@ void awaitingMobileConnection()
 
           // FEEDBACK: CONECTANDO AO WIFI
           JsonDocument prog; prog["type"]="provision_progress"; prog["stage"]=0;
-          JsonDocument prog; prog["type"]="provision_progress"; prog["stage"]=0;
           String o; serializeJson(prog, o); ws.sendTXT(num, o);
 
           String reason;
           bool wifiOk = tryConnectWifi(ssid, pass, reason);
           if (!wifiOk) {
-            JsonDocument res; res["type"]="provision_result"; res["stage"]=0; res["ok"]=false;
+            JsonDocument res; res["type"]="provision_result"; res["stage"]=0; res["ok"]=false; res["reason"]=reason;
             String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
 
             sendNetworks(num);
@@ -99,22 +98,17 @@ void awaitingMobileConnection()
 
           // FEEDBACK: FALHA NA CONEXÃO
           if (!apiOk) {
-            JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=false;
-            JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=false;
+            JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=false; res["reason"]=reason;
             String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
             return;
           }
 
           // FEEDBACK: SUCESSO
-          JsonDocument res; res["type"]="provision_result"; res["stage"]=1; res["ok"]=true;
+          JsonDocument res; res["type"]="final";
           String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
           
           // RECARREGA AS CONFIGURAÇÕES DE INICIALIZAÇÃO
           loadConfig();
-
-          // FEEDBACK: SUCESSO
-          JsonDocument res; res["type"]="final";
-          String oo; serializeJson(res, oo); ws.sendTXT(num, oo);
 
           // RECEBE OS ÚLTIMOS PACOTES
           delay(3000);
@@ -215,27 +209,37 @@ bool postToApi(String &reason)
     return false;
   }
 
+  Serial.println("Http iniciado");
+  
   // HEADERS
   http.addHeader("Content-Type", "application/json");
   http.addHeader("mobile", "true");
   http.addHeader("token", jwtToken);
-
+  
+  Serial.println("Headers definidos");
   // BODY
   JsonDocument doc;
   doc["identificador"] = getIdentifier();
   String body;
   serializeJson(doc, body);
-
+  
+  Serial.println("JSON serializado");
   int code = http.POST(body);
-  if (code != 200)
+  Serial.println("STATUS CODE " + code);
+  if (code != 200) {
+    reason = "http_status_code_" + code;
     return false;
-
+  }
+  
+  Serial.println("Dados Recebidos");
   String payloadStr = http.getString();
   JsonDocument docResponse;
 
   DeserializationError err = deserializeJson(docResponse, payloadStr);
-  if (err)
+  if (err) {
+    reason = "json_deserialization_error";
     return false;
+  }
 
   config.Id = docResponse["payload"]["Id"] | "";
   config.WifiSSID = wifiSsid;
