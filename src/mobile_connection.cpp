@@ -3,7 +3,7 @@
 unsigned long lastActivityTime = 0;
 const unsigned long AP_TIMEOUT_MS = 5L * 60UL * 1000UL;
 
-const uint16_t WS_PORT = 81;
+const uint16_t WS_PORT = 80;
 
 String apiUrl = "";
 String jwtToken = "";
